@@ -7,9 +7,12 @@ import { logger } from "./utils/logger";
  * Provides type-safe access to configuration values with validation
  */
 export class ConfigService {
-  private readonly envConfig: { [key: string]: string };
+  private envConfig!: { [key: string]: string };
 
   constructor(envFilePath: string = `.env`) {
+    this.setEnvConfig(envFilePath);
+  }
+  setEnvConfig(envFilePath: string = `.env`) {
     const rootPath = resolve(process.cwd(), envFilePath);
     const fallbackPath = resolve(__dirname, "../../", envFilePath);
 
@@ -45,8 +48,8 @@ export class ConfigService {
     ) {
       try {
         return JSON.parse(value);
-      } catch (e) {
-        console.log(e);
+      } catch (e: any) {
+        throw new Error(e.message);
       }
     }
 
