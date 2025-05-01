@@ -42,6 +42,9 @@ export function Controller(status: HttpStatus = HttpStatus.OK) {
       const requestId =
         req.headers["x-request-id"] || `req-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
 
+      // Add request ID to request object for tracking
+      (req as any).requestId = requestId;
+
       // Log the request start
       logger.info(`[${requestId}] Request started: ${req.method} ${req.path}`);
 
@@ -124,6 +127,9 @@ export function Redirect() {
       const startTime = performance.now();
       const requestId =
         req.headers["x-request-id"] || `req-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+
+      // Add request ID to request object for tracking
+      (req as any).requestId = requestId;
 
       // Log the request start
       logger.info(`[${requestId}] Redirect request started: ${req.method} ${req.path}`);

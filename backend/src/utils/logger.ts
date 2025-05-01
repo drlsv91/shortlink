@@ -1,12 +1,5 @@
 import chalk from "chalk";
 
-enum LogLevel {
-  ERROR = 0,
-  WARN = 1,
-  INFO = 2,
-  DEBUG = 3,
-}
-
 class Logger {
   private formatMessage(level: string, message: string): string {
     const timestamp = new Date().toISOString();
@@ -44,4 +37,4 @@ const logger = new Logger();
 
 export const createLogger = () => new Logger();
 
-export { Logger, LogLevel, logger };
+export { Logger, logger };
