@@ -74,7 +74,7 @@ This will:
 
 3. Access the application
 
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:5174
 - Backend API: http://localhost:3000
 
 ### Running Tests
