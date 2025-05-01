@@ -1,12 +1,12 @@
-import React, { useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import React, { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { Pagination, URL } from "../types/url";
 import { Button } from "./ui/button";
+import { Card, CardContent, CardFooter } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Card, CardContent, CardFooter } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 interface UrlListProps {
   urls: URL[];
@@ -18,15 +18,7 @@ interface UrlListProps {
   onPageChange: (page: number) => void;
 }
 
-const UrlList: React.FC<UrlListProps> = ({
-  urls,
-  pagination,
-  loading,
-  error,
-  searchTerm,
-  onSearchChange,
-  onPageChange,
-}) => {
+const UrlList: React.FC<UrlListProps> = ({ urls, pagination, error, searchTerm, onSearchChange, onPageChange }) => {
   // Local state for the input field to prevent re-renders on parent component
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -53,8 +45,10 @@ const UrlList: React.FC<UrlListProps> = ({
 
   // Memoize the copy function to prevent re-creation on renders
   const handleCopy = useCallback((url: string) => {
-    navigator.clipboard.writeText(url);
-    toast("URL copied to clipboard!");
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast("URL copied to clipboard!");
+    }
   }, []);
 
   return (
@@ -77,7 +71,6 @@ const UrlList: React.FC<UrlListProps> = ({
         </div>
       </div>
 
-      {loading && <div className="text-center py-4">Loading...</div>}
       {error && <div className="text-red-600 py-4">{error}</div>}
       {urls?.length === 0 ? (
         <div className="text-gray-500 py-4 text-center">No URLs found</div>
