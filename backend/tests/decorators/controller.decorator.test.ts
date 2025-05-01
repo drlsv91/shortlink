@@ -53,7 +53,7 @@ describe("Controller Decorators", () => {
       expect(statusMock).toHaveBeenCalledWith(HttpStatus.OK);
       expect(jsonMock).toHaveBeenCalledWith({
         status: HttpStatus.OK,
-        data: { data: "test data" },
+        metadata: { data: "test data" },
       });
 
       expect(logger.info).toHaveBeenCalledWith(expect.stringContaining("Request completed successfully"));
@@ -111,7 +111,7 @@ describe("Controller Decorators", () => {
       expect(statusMock).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(jsonMock).toHaveBeenCalledWith({
         status: HttpStatus.CREATED,
-        data: { id: 123, name: "New Resource" },
+        metadata: { id: 123, name: "New Resource" },
       });
     });
 

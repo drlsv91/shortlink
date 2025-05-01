@@ -28,9 +28,9 @@ describe("URL Controller", () => {
 
       const response = await request(app).post("/api/encode").send({ originalUrl: mockUrl.originalUrl }).expect(201);
 
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("originalUrl", mockUrl.originalUrl);
-      expect(response.body.data).toHaveProperty("shortUrl");
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("originalUrl", mockUrl.originalUrl);
+      expect(response.body.metadata).toHaveProperty("shortUrl");
 
       expect(prismaMock.url.findFirst).toHaveBeenCalledWith({
         where: { originalUrl: mockUrl.originalUrl },
@@ -51,8 +51,8 @@ describe("URL Controller", () => {
       const response = await request(app).post("/api/encode").send({ originalUrl: "https://example.com" }).expect(201);
 
       expect(response.body).toHaveProperty("status", 201);
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("originalUrl", "https://example.com");
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("originalUrl", "https://example.com");
 
       expect(prismaMock.url.findFirst).toHaveBeenCalledWith({
         where: { originalUrl: "https://example.com" },
@@ -102,9 +102,9 @@ describe("URL Controller", () => {
       const response = await request(app).post("/api/decode").send({ shortUrl: "http://short.est/AbCdEf" }).expect(200);
 
       expect(response.body).toHaveProperty("status", 200);
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("originalUrl", "https://example.com");
-      expect(response.body.data).toHaveProperty("shortUrl", "http://short.est/AbCdEf");
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("originalUrl", "https://example.com");
+      expect(response.body.metadata).toHaveProperty("shortUrl", "http://short.est/AbCdEf");
 
       // Verify database was called correctly
       expect(prismaMock.url.findUnique).toHaveBeenCalledWith({
@@ -145,10 +145,10 @@ describe("URL Controller", () => {
       const response = await request(app).get("/api/statistic/AbCdEf").expect(200);
 
       expect(response.body).toHaveProperty("status", 200);
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("originalUrl", "https://example.com");
-      expect(response.body.data).toHaveProperty("shortPath", "AbCdEf");
-      expect(response.body.data).toHaveProperty("visitCount", 5);
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("originalUrl", "https://example.com");
+      expect(response.body.metadata).toHaveProperty("shortPath", "AbCdEf");
+      expect(response.body.metadata).toHaveProperty("visitCount", 5);
 
       // Verify database was called correctly
       expect(prismaMock.url.findUnique).toHaveBeenCalledWith({
@@ -182,32 +182,52 @@ describe("URL Controller", () => {
       const response = await request(app).get("/api/list").expect(200);
 
       expect(response.body).toHaveProperty("status", 200);
-      expect(response.body).toHaveProperty("data");
-      expect(Array.isArray(response.body.data)).toBe(true);
-      expect(response.body.data.length).toBe(2);
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("data");
+      const data = response.body.metadata.data;
+      expect(Array.isArray(data)).toBe(true);
+      expect(data.length).toBe(2);
 
       // Verify database was called correctly
       expect(prismaMock.url.findMany).toHaveBeenCalledWith({
         where: {},
         orderBy: { createdAt: "desc" },
+        skip: 0,
+        take: 20,
       });
     });
 
     it("should filter URLs by search term", async () => {
-      // Mock finding filtered URLs
       prismaMock.url.findMany.mockResolvedValueOnce([mockUrl]);
 
       const response = await request(app).get("/api/list?search=example").expect(200);
 
       expect(response.body).toHaveProperty("status", 200);
-      expect(response.body).toHaveProperty("data");
-      expect(Array.isArray(response.body.data)).toBe(true);
-      expect(response.body.data.length).toBe(1);
+      expect(response.body).toHaveProperty("metadata");
+      expect(response.body.metadata).toHaveProperty("data");
+      const data = response.body.metadata.data;
+      expect(Array.isArray(data)).toBe(true);
+      expect(data.length).toBe(1);
 
       // Verify database was called correctly with search parameter
       expect(prismaMock.url.findMany).toHaveBeenCalledWith({
         where: { originalUrl: { contains: "example", mode: "insensitive" } },
         orderBy: { createdAt: "desc" },
+        skip: 0,
+        take: 20,
+      });
+    });
+    it("should filter URLs by pagination", async () => {
+      prismaMock.url.findMany.mockResolvedValueOnce([mockUrl]);
+
+      await request(app).get("/api/list?page=2&limit=22").expect(200);
+
+      // Verify database was called correctly with search parameter
+      expect(prismaMock.url.findMany).toHaveBeenCalledWith({
+        where: {},
+        orderBy: { createdAt: "desc" },
+        skip: 22,
+        take: 22,
       });
     });
 
@@ -216,6 +236,14 @@ describe("URL Controller", () => {
 
       expect(response.body).toHaveProperty("status", 400);
       expect(response.body).toHaveProperty("errors");
+
+      expect(prismaMock.url.findMany).not.toHaveBeenCalled();
+    });
+    it("should return 400 for invalid pagination data", async () => {
+      await request(app).get("/api/list?page=1e").expect(400);
+      await request(app).get("/api/list?page=1001").expect(400);
+      await request(app).get("/api/list?limit=1001").expect(400);
+      await request(app).get("/api/list?limit=1x").expect(400);
 
       expect(prismaMock.url.findMany).not.toHaveBeenCalled();
     });
@@ -271,7 +299,7 @@ describe("URL Controller", () => {
 
       const statsResponse = await request(app).get("/api/statistic/AbCdEf").expect(200);
 
-      expect(statsResponse.body.data.visitCount).toBe(1);
+      expect(statsResponse.body.metadata.visitCount).toBe(1);
 
       expect(prismaMock.url.create).toHaveBeenCalledTimes(1);
       expect(prismaMock.url.update).toHaveBeenCalledTimes(1);

@@ -1,4 +1,13 @@
+import chalk from "chalk";
 import { createLogger } from "../../src/utils/logger";
+
+jest.mock("chalk", () => ({
+  red: jest.fn((text) => text),
+  yellow: jest.fn((text) => text),
+  cyan: jest.fn((text) => text),
+  gray: jest.fn((text) => text),
+}));
+
 describe("Logger", () => {
   let logger: ReturnType<typeof createLogger>;
 
@@ -8,11 +17,16 @@ describe("Logger", () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("should log info messages", () => {
     const consoleSpy = jest.spyOn(console, "info").mockImplementation(() => {});
 
     logger.info("test info");
 
+    expect(chalk.cyan).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[INFO] test info"));
     consoleSpy.mockRestore();
   });
@@ -22,6 +36,7 @@ describe("Logger", () => {
 
     logger.debug("test debug");
 
+    expect(chalk.gray).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[DEBUG] test debug"));
     consoleSpy.mockRestore();
   });
@@ -38,6 +53,7 @@ describe("Logger", () => {
 
     logger.warn("test warn");
 
+    expect(chalk.yellow).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[WARN] test warn"));
     consoleSpy.mockRestore();
   });
@@ -46,6 +62,7 @@ describe("Logger", () => {
 
     logger.error("test error");
 
+    expect(chalk.red).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ERROR] test error"));
     consoleSpy.mockRestore();
   });
