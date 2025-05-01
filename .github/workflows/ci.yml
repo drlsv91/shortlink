@@ -1,11 +1,9 @@
 name: CI Pipeline
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -19,15 +17,32 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
+          run_install: false
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
+          cache: pnpm
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: |
+          pwd
+          ls
+          pnpm install
 
       - name: Run backend tests
         working-directory: ./backend
@@ -57,8 +72,8 @@ jobs:
 
       - name: Update README with coverage badges
         run: |
-          sed -i "s|<!-- BACKEND_COVERAGE_BADGE -->|![Backend Coverage](https://img.shields.io/badge/Backend_Coverage-${env:BACKEND_COVERAGE}-brightgreen)|g" README.md
-          sed -i "s|<!-- FRONTEND_COVERAGE_BADGE -->|![Frontend Coverage](https://img.shields.io/badge/Frontend_Coverage-${env:FRONTEND_COVERAGE}-brightgreen)|g" README.md
+          sed -i "s|<!-- BACKEND_COVERAGE_BADGE -->|![Backend Coverage](https://img.shields.io/badge/Backend_Coverage-${BACKEND_COVERAGE}-brightgreen)|g" README.md
+          sed -i "s|<!-- FRONTEND_COVERAGE_BADGE -->|![Frontend Coverage](https://img.shields.io/badge/Frontend_Coverage-${FRONTEND_COVERAGE}-brightgreen)|g" README.md
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
           git add README.md
