@@ -11,20 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 10
-          run_install: false
-
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Run backend tests
         working-directory: ./backend
@@ -33,14 +26,14 @@ jobs:
           NODE_ENV: test
           BASE_URL: http://short.est
         run: |
-          pnpm test
-          pnpm test:coverage
+          npm test
+          npm test:coverage
 
       - name: Run frontend tests
         working-directory: ./frontend
         run: |
-          pnpm test
-          pnpm test:coverage
+          npm test
+          npm test:coverage
 
       - name: Generate coverage badges
         run: |
