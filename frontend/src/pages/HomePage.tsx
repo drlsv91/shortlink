@@ -4,7 +4,7 @@ import UrlForm from "../components/UrlForm";
 import UrlList from "../components/UrlList";
 
 const HomePage: React.FC = () => {
-  const { urls, loading, error, searchTerm, setSearchTerm, refreshUrls } = useUrlList();
+  const { urls, pagination, loading, error, searchTerm, setSearchTerm, handlePageChange, refreshUrls } = useUrlList();
 
   return (
     <div className="mx-auto px-4 py-8">
@@ -18,7 +18,15 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <UrlList urls={urls} loading={loading} error={error} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <UrlList
+          urls={urls}
+          pagination={pagination}
+          loading={loading}
+          error={error}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );
