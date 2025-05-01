@@ -34,7 +34,7 @@ interface HttpResponse<T> {
  * @param descriptor The method descriptor
  */
 export function Controller(status: HttpStatus = HttpStatus.OK) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value as ControllerMethod;
 
     descriptor.value = async function (req: Request, res: Response) {
@@ -120,7 +120,7 @@ export function Created() {
  * Decorator to handle redirect responses
  */
 export function Redirect() {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value as ControllerMethod;
 
     descriptor.value = async function (req: Request, res: Response) {

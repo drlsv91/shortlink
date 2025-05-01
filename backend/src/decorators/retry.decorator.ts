@@ -7,7 +7,7 @@ export interface RetryOptions {
 
 // A decorator specific for collision retries
 export function RetryOnCollision(maxAttempts: number = 5, onRetry?: (attempt: number) => void) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
