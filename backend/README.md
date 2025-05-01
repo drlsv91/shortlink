@@ -82,13 +82,19 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/shortlink"
 BASE_URL="http://short.est"
 ```
 
-3. Set up the database and run migrations
+3. Generate Prisma client
 
 ```bash
-pnpm exec prisma migrate dev
+pnpm prisma:generate
 ```
 
-4. Start the development server
+4. Set up the database and run migrations
+
+```bash
+pnpm prisma:migrate
+```
+
+5. Start the development server
 
 ```bash
 pnpm dev
