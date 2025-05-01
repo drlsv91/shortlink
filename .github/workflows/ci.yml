@@ -4,45 +4,26 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+
 jobs:
   build:
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        node-version: [20]
     steps:
       - uses: actions/checkout@v4
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
-          run_install: false
+          version: 8.15.4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 20
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: |
-          pwd
-          ls
-          pnpm install
+        run: pnpm install
 
       - name: Run backend tests
         working-directory: ./backend
@@ -63,19 +44,30 @@ jobs:
       - name: Generate coverage badges
         run: |
           # Backend coverage
-          BACKEND_COVERAGE=$(grep -oE '"total":{[^}]*"lines":{[^}]*"pct":[0-9.]+' backend/coverage/coverage-summary.json | grep -oE '[0-9.]+%' | head -1)
-          echo "BACKEND_COVERAGE=${BACKEND_COVERAGE}" >> $GITHUB_ENV
+          BACKEND_COVERAGE=$(jq '.total.lines.pct' backend/coverage/coverage-summary.json)
+          BACKEND_COVERAGE_FORMATTED=$(printf "%.2f%%" $BACKEND_COVERAGE)
+          echo "Backend Coverage: $BACKEND_COVERAGE_FORMATTED"
 
           # Frontend coverage
-          FRONTEND_COVERAGE=$(grep -oE '"total":{[^}]*"lines":{[^}]*"pct":[0-9.]+' frontend/coverage/coverage-summary.json | grep -oE '[0-9.]+%' | head -1)
-          echo "FRONTEND_COVERAGE=${FRONTEND_COVERAGE}" >> $GITHUB_ENV
+          FRONTEND_COVERAGE=$(jq '.total.lines.pct' frontend/coverage/coverage-summary.json)
+          FRONTEND_COVERAGE_FORMATTED=$(printf "%.2f%%" $FRONTEND_COVERAGE)
+          echo "Frontend Coverage: $FRONTEND_COVERAGE_FORMATTED"
 
-      - name: Update README with coverage badges
+          # Determine badge color based on coverage percentage
+          backend_color=$(echo "$BACKEND_COVERAGE < 50" | bc)
+          frontend_color=$(echo "$FRONTEND_COVERAGE < 50" | bc)
+
+          BACKEND_BADGE_COLOR=$([[ "$backend_color" == "1" ]] && echo "red" || echo "brightgreen")
+          FRONTEND_BADGE_COLOR=$([[ "$frontend_color" == "1" ]] && echo "red" || echo "brightgreen")
+
+          # Update README with dynamic badges
+          sed -i "s|<!-- BACKEND_COVERAGE_BADGE -->|![Backend Coverage](https://img.shields.io/badge/Backend_Coverage-${BACKEND_COVERAGE_FORMATTED}-${BACKEND_BADGE_COLOR})|g" README.md
+          sed -i "s|<!-- FRONTEND_COVERAGE_BADGE -->|![Frontend Coverage](https://img.shields.io/badge/Frontend_Coverage-${FRONTEND_COVERAGE_FORMATTED}-${FRONTEND_BADGE_COLOR})|g" README.md
+
+      - name: Commit and push README changes
         run: |
-          sed -i "s|<!-- BACKEND_COVERAGE_BADGE -->|![Backend Coverage](https://img.shields.io/badge/Backend_Coverage-${BACKEND_COVERAGE}-brightgreen)|g" README.md
-          sed -i "s|<!-- FRONTEND_COVERAGE_BADGE -->|![Frontend Coverage](https://img.shields.io/badge/Frontend_Coverage-${FRONTEND_COVERAGE}-brightgreen)|g" README.md
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add README.md
-          git commit -m "Update test coverage badges [skip ci]" || echo "No changes to commit"
+          git commit -m "Update coverage badges [skip ci]" || exit 0
           git push
