@@ -1,3 +1,5 @@
+<!-- FRONTEND_COVERAGE_BADGE -->
+
 # ShortLink - URL Shortening Service
 
 A full-stack URL shortening service built with Node.js, Express, TypeScript, React, and PostgreSQL.

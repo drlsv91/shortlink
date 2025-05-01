@@ -1,3 +1,5 @@
+<!-- BACKEND_COVERAGE_BADGE -->
+
 # ShortLink Backend
 
 The Node.js Express backend API for the ShortLink URL shortening service.
