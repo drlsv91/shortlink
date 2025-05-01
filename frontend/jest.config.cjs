@@ -28,7 +28,9 @@ module.exports = {
     "src/**/*.{js,jsx,ts,tsx}",
     "!src/**/*.d.ts",
     "!src/services/**/*.ts",
+    "!src/components/ui/**/*.tsx",
     "!src/main.tsx",
+    "!src/App.tsx",
     "!src/vite-env.d.ts",
   ],
 };
