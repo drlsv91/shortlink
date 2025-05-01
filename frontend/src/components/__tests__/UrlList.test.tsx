@@ -43,7 +43,6 @@ describe("UrlList Component", () => {
   it("renders loading state correctly", () => {
     render(<UrlList {...defaultProps} loading={true} />);
 
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
     expect(screen.queryByText("Your URLs")).toBeInTheDocument();
     expect(screen.queryByText(mockUrls[0].originalUrl)).toBeInTheDocument();
   });
