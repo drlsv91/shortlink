@@ -22,7 +22,7 @@ type ControllerMethod = (req: Request, res: Response) => Promise<any>;
  */
 interface HttpResponse<T> {
   status: HttpStatus;
-  data?: T;
+  metadata?: T;
   message?: string;
   error?: string;
 }
@@ -65,7 +65,7 @@ export function Controller(status: HttpStatus = HttpStatus.OK) {
         // Create a standardized response
         const response: HttpResponse<typeof result> = {
           status,
-          data: result,
+          metadata: result,
         };
 
         // Send the response

@@ -66,6 +66,9 @@ export class UrlController {
   @Controller()
   public async listUrls(req: Request, res: Response): Promise<any> {
     const searchTerm = req.query.search as string | undefined;
-    return await this.urlService.listUrls(searchTerm);
+    return await this.urlService.listUrls(searchTerm, {
+      page: Number(req.query.page),
+      limit: Number(req.query.limit),
+    });
   }
 }

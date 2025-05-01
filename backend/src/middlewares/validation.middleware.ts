@@ -19,9 +19,11 @@ export const validateStatisticRequest: any = [
 export const validateListRequest: any = [
   query("search")
     .optional()
-    .isLength({ min: 3 })
+    .isLength({ min: 3, max: 255 })
     .withMessage("Search term must be at least 3 characters long")
     .if(query("search").exists()),
+  query("page").optional().isInt({ min: 1, max: 1000 }),
+  query("limit").optional().isInt({ min: 1, max: 1000 }),
   validateResults,
 ];
 
