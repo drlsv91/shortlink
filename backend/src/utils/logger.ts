@@ -1,3 +1,5 @@
+import chalk from "chalk";
+
 enum LogLevel {
   ERROR = 0,
   WARN = 1,
@@ -13,29 +15,27 @@ class Logger {
 
   error(message: string, error?: Error): void {
     const formattedMessage = this.formatMessage("ERROR", message);
-    console.error(formattedMessage);
+    console.error(chalk.red(formattedMessage));
     if (error) {
-      console.error(error.stack ?? error.message);
+      console.error(chalk.red(error.stack ?? error.message));
     }
   }
 
   warn(message: string): void {
     const formattedMessage = this.formatMessage("WARN", message);
-    console.warn(formattedMessage);
+    console.warn(chalk.yellow(formattedMessage));
   }
 
   info(message: string): void {
-    console.log(message);
-
     const formattedMessage = this.formatMessage("INFO", message);
-    console.info(formattedMessage);
+    console.info(chalk.cyan(formattedMessage));
   }
 
   debug(message: string, data?: any): void {
     const formattedMessage = this.formatMessage("DEBUG", message);
-    console.debug(formattedMessage);
+    console.debug(chalk.gray(formattedMessage));
     if (data) {
-      console.debug(data);
+      console.debug(chalk.gray(data));
     }
   }
 }
