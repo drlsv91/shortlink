@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Pagination, URL } from "../types/url";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:9900";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 export const api = {
   /**
