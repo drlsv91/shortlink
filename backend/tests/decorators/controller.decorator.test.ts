@@ -142,7 +142,7 @@ describe("Controller Decorators", () => {
     it("should redirect to returned URL", async () => {
       await controller.redirectToUrl(mockReq as Request, mockRes as Response);
 
-      expect(redirectMock).toHaveBeenCalledWith("https://example.com");
+      expect(redirectMock).toHaveBeenCalledWith(301, "https://example.com");
 
       expect(logger.info).toHaveBeenCalledWith(
         expect.stringContaining("Redirect completed successfully to: https://example.com")

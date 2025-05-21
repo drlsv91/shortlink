@@ -255,7 +255,7 @@ describe("URL Controller", () => {
       prismaMock.url.findUnique.mockResolvedValueOnce(mockUrl);
       prismaMock.url.update.mockResolvedValueOnce(mockUrlWithVisit);
 
-      const response = await request(app).get("/AbCdEf").expect(302); // 302 is the redirect status code
+      const response = await request(app).get("/AbCdEf").expect(301);
 
       expect(response.header.location).toBe("https://example.com");
 
@@ -293,7 +293,7 @@ describe("URL Controller", () => {
       prismaMock.url.findUnique.mockResolvedValueOnce(mockUrl);
       prismaMock.url.update.mockResolvedValueOnce(mockUrlWithVisit);
 
-      await request(app).get("/AbCdEf").expect(302).expect("Location", "https://example.com");
+      await request(app).get("/AbCdEf").expect(301).expect("Location", "https://example.com");
 
       prismaMock.url.findUnique.mockResolvedValueOnce(mockUrlWithVisit);
 

@@ -34,10 +34,10 @@ describe("Logger", () => {
   it("should log debug messages", () => {
     const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
-    logger.debug("test debug");
+    logger.debug("test debug!");
 
     expect(chalk.gray).toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[DEBUG] test debug"));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[DEBUG] test debug!"));
     consoleSpy.mockRestore();
   });
   it("should log debug data", () => {

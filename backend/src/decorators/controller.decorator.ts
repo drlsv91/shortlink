@@ -149,7 +149,7 @@ export function Redirect() {
         }
 
         // Redirect to the URL
-        res.redirect(redirectUrl);
+        res.redirect(301, redirectUrl);
 
         // Log the successful redirect with timing
         logger.info(
